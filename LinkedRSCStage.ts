@@ -16,6 +16,7 @@ class LinkedRSCStage {
         this.canvas.width = w
         this.canvas.height = h
         this.context = this.canvas.getContext('2d')
+        document.body.appendChild(this.canvas)
     }
 
     render() {
@@ -99,9 +100,10 @@ class RSCNode {
     }
 
     draw(context : CanvasRenderingContext2D) {
+        context.lineWidth = Math.min(w, h) / 60
         const gap : number = w / (nodes + 1)
-        var sc1 : number = Math.max(0.5, this.state.scale) * 2
-        const sc2 : number = Math.max(0.5, Math.min(0, this.state.scale - 0.5)) * 2
+        var sc1 : number = Math.min(0.5, this.state.scale) * 2
+        const sc2 : number = Math.min(0.5, Math.max(0, this.state.scale - 0.5)) * 2
         const index : number = this.i % 2
         sc1 = (1 - index) * sc1 + (1 - sc1) * index
         context.save()
