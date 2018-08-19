@@ -3,6 +3,8 @@ const nodes : number = 5
 class LinkedRSCStage {
     canvas : HTMLCanvasElement = document.createElement('canvas')
     context : CanvasRenderingContext2D
+    lrsc : LinkedRSC = new LinkedRSC()
+    animator : Animator = new Animator()
 
     constructor() {
         this.initCanvas()
@@ -19,11 +21,20 @@ class LinkedRSCStage {
     render() {
         this.context.fillStyle = '#212121'
         this.context.fillRect(0, 0, w, h)
+        this.lrsc.draw(this.context)
     }
 
     handleTap() {
         this.canvas.onmousedown = () => {
-
+            this.lrsc.startUpdating(() => {
+                this.animator.start(() => {
+                    this.render()
+                    this.lrsc.update(() => {
+                        this.animator.stop()
+                        this.render()
+                    })
+                })
+            })
         }
     }
 
