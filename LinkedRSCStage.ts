@@ -1,5 +1,5 @@
 const w : number = window.innerWidth, h : number = window.innerHeight
-
+const nodes : number = 5
 class LinkedRSCStage {
     canvas : HTMLCanvasElement = document.createElement('canvas')
     context : CanvasRenderingContext2D
@@ -69,5 +69,63 @@ class Animator {
             this.animated = false
             clearInterval(this.interval)
         }
+    }
+}
+
+class RSCNode {
+    state : State = new State()
+    prev : RSCNode
+    next : RSCNode
+    constructor(private i : number) {
+        this.addNeighbor()
+    }
+
+    addNeighbor() {
+        if (this.i < nodes - 1) {
+            this.next = new RSCNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    draw(context : CanvasRenderingContext2D) {
+        const gap : number = w / (nodes + 1)
+        var sc1 : number = Math.max(0.5, this.state.scale) * 2
+        const sc2 : number = Math.max(0.5, Math.min(0, this.state.scale - 0.5)) * 2
+        const index : number = this.i % 2
+        sc1 = (1 - index) * sc1 + (1 - sc1) * index
+        context.save()
+        context.translate(gap * this.i + gap / 2 + gap * sc2, h/2)
+        context.strokeStyle = 'white'
+        context.beginPath()
+        context.arc(0, 0, gap/4, 0, 2 * Math.PI)
+        context.stroke()
+        context.fillStyle = '#f44336'
+        context.beginPath()
+        context.arc(0, 0, gap / 8 + (gap / 8) * sc1, 0, 2 * Math.PI)
+        context.fill()
+        context.restore()
+        if (this.next) {
+            this.next.draw(context)
+        }
+    }
+
+    update(cb : Function) {
+        this.state.update(cb)
+    }
+
+    startUpdating(cb : Function) {
+        this.state.startUpdating(cb)
+    }
+
+    getNext(dir : number, cb : Function) : RSCNode {
+        var curr : RSCNode = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr) {
+            return curr
+        }
+        cb()
+        return this
     }
 }
